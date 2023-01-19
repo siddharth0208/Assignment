@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,34 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Animated,
 } from 'react-native';
 import OTPTextInput from 'react-native-otp-textinput';
+import Lottie from 'lottie-react-native';
 
-const Login = () => {
+const Login = ({navigation}) => {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const animationRef = useRef(null);
+
+  useEffect(() => {
+    animationRef?.current?.play();
+  }, []);
+
+  const onSubmit = () => {
+    setLoading(true);
+    let time = setTimeout(() => {
+      setSuccess(true);
+      // clearTimeout(time);
+      let time2 = setTimeout(() => {
+        // alert();
+        setSuccess(false);
+        navigation.navigate('Dashbord');
+        // clearTimeout(time2);
+      }, 500);
+    }, 1000);
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -17,22 +41,70 @@ const Login = () => {
         style={styles.loginImg}
         source={require('../../../assets/Images/login.png')}
       />
-      <Text style={styles.title}>Enter 6 digit OTP sent on</Text>
-      <View style={{flexDirection: 'row', alignSelf: 'center', marginTop: 10}}>
-        <Text style={styles.subTitle}>+91-999-014-7856</Text>
-        <Text style={styles.topBotton}>Change</Text>
-      </View>
-      <OTPTextInput
-        tintColor="#0062FF"
-        offTintColor="#0062FF"
-        containerStyle={{width: '70%', alignSelf: 'center', marginVertical: 20}}
-        inputCount={6}
-        textInputStyle={styles.textInput}
-        ref={e => (this.otpInput = e)}
-      />
-      <TouchableOpacity style={styles.submitBotton}>
-        <Text style={styles.submitBottonText}>Submit</Text>
-      </TouchableOpacity>
+      {loading === false ? (
+        <View>
+          <Text style={styles.title}>Enter 6 digit OTP sent on</Text>
+          <View
+            style={{flexDirection: 'row', alignSelf: 'center', marginTop: 10}}>
+            <Text style={styles.subTitle}>+91-999-014-7856</Text>
+            <Text style={styles.topBotton}>Change</Text>
+          </View>
+          <OTPTextInput
+            tintColor="#0062FF"
+            offTintColor="#0062FF"
+            containerStyle={{
+              width: '70%',
+              alignSelf: 'center',
+              marginVertical: 20,
+            }}
+            inputCount={6}
+            textInputStyle={styles.textInput}
+          />
+          <TouchableOpacity
+            style={styles.submitBotton}
+            onPress={() => {
+              onSubmit();
+            }}>
+            <Text style={styles.submitBottonText}>Submit</Text>
+          </TouchableOpacity>
+          <Text style={styles.bottomText}>Resend OTP 30s</Text>
+        </View>
+      ) : (
+        <View>
+          {success === true ? (
+            <Text style={styles.loginSuccess}>Login Success!</Text>
+          ) : (
+            <></>
+          )}
+          <View>
+            {success === false ? (
+              <Lottie
+                style={{
+                  width: 110,
+                  height: 110,
+                  alignSelf: 'center',
+                  marginTop: 25,
+                }}
+                ref={animationRef}
+                source={require('../../../assets/Animations/Loading.json')}
+                autoPlay={true}
+              />
+            ) : (
+              <Lottie
+                style={{
+                  width: 110,
+                  height: 110,
+                  alignSelf: 'center',
+                  marginTop: 35,
+                }}
+                ref={animationRef}
+                source={require('../../../assets/Animations/Success.json')}
+                autoPlay={true}
+              />
+            )}
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -81,6 +153,18 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     textAlign: 'center',
+  },
+  bottomText: {
+    textAlign: 'center',
+    color: '#808080',
+    fontSize: 18,
+    marginTop: 12,
+  },
+  loginSuccess: {
+    color: '#181818',
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: '600',
   },
 });
 export default Login;
